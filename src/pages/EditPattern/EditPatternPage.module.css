@@ -1,0 +1,390 @@
+.page {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.backButton {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--twine-text-muted);
+  padding: 0;
+}
+
+.backButton:hover {
+  color: var(--twine-accent);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nameInput {
+  font-size: 1.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--twine-text);
+  flex: 1;
+  min-width: 200px;
+}
+
+.nameInput:hover,
+.nameInput:focus {
+  border-color: var(--twine-border);
+  background: var(--twine-surface);
+}
+
+.dirtyBadge {
+  font-size: 0.8rem;
+  color: var(--twine-text-muted);
+  background: var(--twine-surface-raised);
+  border: 1px solid var(--twine-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.headerActions button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--twine-border);
+  background: var(--twine-surface);
+  color: var(--twine-text);
+}
+
+.primaryButton {
+  background: var(--twine-accent) !important;
+  color: var(--twine-accent-contrast) !important;
+  border-color: var(--twine-accent) !important;
+}
+
+.section {
+  background: var(--twine-surface);
+  border: 1px solid var(--twine-border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.section h2 {
+  margin-top: 0;
+}
+
+.errorText {
+  color: var(--twine-danger);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Palette */
+
+.paletteGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.75rem;
+}
+
+.paletteSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--twine-border);
+  border-radius: 8px;
+}
+
+.paletteIndex {
+  font-size: 0.8rem;
+  color: var(--twine-text-muted);
+}
+
+.unsetLabel {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--twine-text-muted);
+}
+
+/* Cards */
+
+.cardCountRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.cardCountRow input {
+  width: 6rem;
+}
+
+.cardsTableWrapper {
+  overflow-x: auto;
+}
+
+.cardsTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.cardsTable th,
+.cardsTable td {
+  border: 1px solid var(--twine-border);
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  min-width: 2.5rem;
+}
+
+.cardsTable th[scope='row'] {
+  text-align: right;
+  background: var(--twine-surface-raised);
+  position: sticky;
+  left: 0;
+  white-space: nowrap;
+}
+
+.holesInput {
+  width: 3.5rem;
+}
+
+.naCell {
+  background: var(--twine-surface-raised);
+}
+
+.holeCell {
+  width: 100%;
+  height: 100%;
+  min-height: 1.75rem;
+  border: 1px solid var(--twine-border);
+  border-radius: 4px;
+  padding: 0;
+  font-size: 0.7rem;
+  color: var(--twine-text);
+  mix-blend-mode: difference;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.holeCell:hover {
+  border-color: var(--twine-accent);
+}
+
+.holeCellUnset {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--twine-border) 0,
+    var(--twine-border) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+  background-color: var(--twine-surface-raised);
+  mix-blend-mode: normal;
+  color: var(--twine-text-muted);
+}
+
+.dangerButton {
+  color: var(--twine-danger);
+  border-color: var(--twine-danger) !important;
+  background: var(--twine-surface);
+}
+
+.dangerButton:hover {
+  background: var(--twine-danger);
+  color: var(--twine-accent-contrast);
+}
+
+/* Picks */
+
+.pickCellActive,
+.pickCellInactive {
+  width: 100%;
+  min-width: 2.25rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  font-family: var(--twine-font-mono);
+  font-size: 0.85rem;
+  touch-action: none;
+}
+
+.pickCellActive {
+  border: 1px solid var(--twine-border);
+  background: var(--twine-surface-raised);
+  color: var(--twine-text);
+}
+
+.pickCellActive:hover {
+  border-color: var(--twine-accent);
+}
+
+.pickCellInactive {
+  border: 1px dashed var(--twine-border);
+  background: transparent;
+  color: var(--twine-text-muted);
+}
+
+/* Packs */
+
+.packList {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.packItem {
+  border: 1px solid var(--twine-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.packHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.orderInput {
+  width: 4rem;
+  margin-left: 0.35rem;
+}
+
+.cardChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cardChip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--twine-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.createNew {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Modal (same visual language as PatternSelectionPage's) */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--twine-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 10px 30px var(--twine-shadow);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* Responsive layout pass (smartphone) — see PROJECT-PROMPT.md "Aesthetics":
+   "Use responsive layout to provide the same content with optimized
+   aesthetics on both desktop and smartphone." */
+@media (max-width: 640px) {
+  .page {
+    padding: 1rem 0.5rem 3rem;
+    gap: 1rem;
+  }
+
+  .nameInput {
+    font-size: 1.3rem;
+    min-width: 0;
+  }
+
+  .headerActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerActions button {
+    width: 100%;
+  }
+
+  .section {
+    padding: 0.75rem;
+  }
+
+  .cardsTable th,
+  .cardsTable td {
+    padding: 0.2rem 0.3rem;
+    min-width: 2rem;
+  }
+
+  .pickCellActive,
+  .pickCellInactive {
+    min-width: 1.9rem;
+    padding: 0.25rem 0.3rem;
+  }
+}
+
+/* Touch devices need larger tap targets than mouse-driven ones, regardless
+   of viewport width. This matters most for the Picks grid, whose cells are
+   also the target of swipe gestures (see PROJECT-PROMPT.md: "The edits
+   should be intuitive for Mouse usage on desktop browser and for touch in
+   smartphones."). */
+@media (pointer: coarse) {
+  .holeCell,
+  .pickCellActive,
+  .pickCellInactive,
+  .dangerButton {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

@@ -1,0 +1,102 @@
+:root {
+  /* Light theme tokens. Dark-mode overrides follow in the
+     prefers-color-scheme block below, per PROJECT-PROMPT.md "Aesthetics":
+     "Use a typical color palette for the UI elements and adjust to the
+     system's light/dark mode." */
+  --twine-bg: #f7f6f3;
+  --twine-surface: #ffffff;
+  --twine-surface-raised: #ffffff;
+  --twine-text: #1f1b16;
+  --twine-text-muted: #6b6356;
+  --twine-border: #ddd8cf;
+  --twine-accent: #a33b20; /* madder red, echoing the default palette */
+  --twine-accent-contrast: #ffffff;
+  --twine-accent-hover: #8a3119;
+  --twine-danger: #b3261e;
+  --twine-danger-hover: #932017;
+  --twine-focus-ring: #2d4f6c; /* woad blue */
+  --twine-shadow: rgba(0, 0, 0, 0.12);
+  --twine-hatch-stripe: #ffffff33;
+
+  --twine-font-sans: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --twine-font-mono: ui-monospace, 'SF Mono', Consolas, monospace;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --twine-bg: #15130f;
+    --twine-surface: #211e18;
+    --twine-surface-raised: #2a261f;
+    --twine-text: #f1ede4;
+    --twine-text-muted: #b8ae9c;
+    --twine-border: #3a3528;
+    --twine-accent: #e07856;
+    --twine-accent-contrast: #15130f;
+    --twine-accent-hover: #ec8d6e;
+    --twine-danger: #ff6b61;
+    --twine-danger-hover: #ff847b;
+    --twine-focus-ring: #7fa6c9;
+    --twine-shadow: rgba(0, 0, 0, 0.5);
+    --twine-hatch-stripe: #00000033;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--twine-bg);
+  color: var(--twine-text);
+  font-family: var(--twine-font-sans);
+  line-height: 1.45;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--twine-text);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--twine-focus-ring);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--twine-accent);
+}
+
+/* Printing is scoped exclusively to the Weaving Draft view (see
+   src/pages/WeavingDraft/print.css); outside of that view's own print
+   stylesheet, hide everything but the draft when printing anywhere in the
+   app shell, as a defensive fallback. */
+@media print {
+  .twine-app-chrome {
+    display: none !important;
+  }
+}

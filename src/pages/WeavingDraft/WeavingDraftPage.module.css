@@ -1,0 +1,56 @@
+.page {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.backButton {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--twine-text-muted);
+  padding: 0;
+}
+
+.backButton:hover {
+  color: var(--twine-accent);
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.placeholderNote {
+  color: var(--twine-text-muted);
+  background: var(--twine-surface);
+  border: 1px dashed var(--twine-border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.errorText {
+  color: var(--twine-danger);
+}
+
+/* Responsive layout pass (smartphone) — see PROJECT-PROMPT.md "Aesthetics".
+   This page is currently a Stage 3 stub; full draft-grid responsive rules
+   will be added alongside the real rendering implementation. */
+@media (max-width: 640px) {
+  .page {
+    padding: 1rem 0.5rem 3rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+}
