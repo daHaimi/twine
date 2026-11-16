@@ -132,7 +132,9 @@ Computes the Stage 3 Weaving Draft rendering model for a pattern:
   delta to the cell's action text (`F`, `B`, `.`) with the hole count appended
   for multi-turn actions (`F2`, `B2`, …), per the user's clarification of
   `webbrief.png`.
-- `rowLabel` produces the A/B/C… row labels of `webbrief.png`.
+- `holeLabel` produces the A/B/C… hole labels of the setup grid, while
+  `pickRowLabel` numbers draft rows 1..N and wraps back to 1 after the
+  pattern's last pick (so each displayed repetition restarts at 1).
 - `expandDraftRows` repeats the *whole* pattern 1–4 times (clamped) and
   annotates each row with a `repeatIndex` so the view can draw the thicker
   separator between repetitions.
