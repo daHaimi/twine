@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { DraftChart } from '@/components/DraftChart/DraftChart'
@@ -22,6 +22,7 @@ const PAGE_MARGIN_PRESETS = [
 ] as const
 
 const DEFAULT_MARGIN_MM = 20
+const MARGIN_STYLE_ID = 'twine-draft-page-margin'
 
 /**
  * "Weaving draft" state: renders the shared thread-path chart of
@@ -38,6 +39,21 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
   const [repetitions, setRepetitions] = useState(1)
   const [marginMm, setMarginMm] = useState<number>(DEFAULT_MARGIN_MM)
   const draftRows = useDraftRows(pattern)
+
+  // `@page` cannot read CSS custom properties in Chromium, and some browsers
+  // ignore @page rules from <style> elements in <body> — keep the generated
+  // rule in <head> so every browser's print pipeline sees it.
+  useLayoutEffect(() => {
+    let style = document.getElementById(MARGIN_STYLE_ID) as HTMLStyleElement | null
+    if (!style) {
+      style = document.createElement('style')
+      style.id = MARGIN_STYLE_ID
+      style.setAttribute('data-testid', 'draft-page-margin-rule')
+      document.head.appendChild(style)
+    }
+    style.textContent = `@page { size: A4 portrait; margin: ${marginMm}mm; }`
+    return () => style?.remove()
+  }, [marginMm])
 
   useEffect(() => {
     if (patternId) void load(patternId)
@@ -65,9 +81,6 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
 
   return (
     <main className={`${styles.page} twine-draft-page`}>
-      {/* `@page` cannot read CSS custom properties in Chromium, so the chosen
-          margin is injected as its own @page rule (later than print.css). */}
-      <style data-testid="draft-page-margin-rule">{`@page { size: A4 portrait; margin: ${marginMm}mm; }`}</style>
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <button
@@ -108,6 +121,9 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
             Print
           </button>
         </div>
+        <p className={`${styles.printHint} twine-draft-noprint`}>
+          If the print preview shows no margins, set your browser's print-dialog margins to “Default” (not “None”).
+        </p>
       </header>
 
       <section className={styles.chartSection}>

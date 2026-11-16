@@ -70,6 +70,12 @@
   color: var(--twine-accent-contrast);
 }
 
+.printHint {
+  margin: 0;
+  color: var(--twine-text-muted);
+  font-size: 0.8rem;
+}
+
 .errorText {
   color: var(--twine-danger);
 }

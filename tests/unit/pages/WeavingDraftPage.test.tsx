@@ -72,15 +72,16 @@ describe('WeavingDraftPage', () => {
 
   it('offers common A4 margin presets and injects the selected @page rule', async () => {
     const pattern = await createNewPattern('Margins')
-    const { container } = renderDraft(pattern.id, 'edit')
+    renderDraft(pattern.id, 'edit')
     await screen.findByText('Margins')
 
+    const injectedRule = () => document.head.querySelector('[data-testid="draft-page-margin-rule"]')?.textContent
     const selector = screen.getByLabelText(/Margins/i)
     expect(selector).toHaveValue('20')
-    expect(container.querySelector('style')?.textContent).toContain('margin: 20mm')
+    expect(injectedRule()).toContain('margin: 20mm')
 
     await userEvent.selectOptions(selector, '30')
-    expect(container.querySelector('style')?.textContent).toContain('margin: 30mm')
+    expect(injectedRule()).toContain('margin: 30mm')
     expect(screen.getByRole('option', { name: 'Wide (30 mm)' })).toBeInTheDocument()
   })
 
