@@ -127,7 +127,10 @@ Computes the Stage 3 Weaving Draft rendering model for a pattern:
   plus the palette colour at the card's weaving position (before that pick).
 - `draftSymbol` maps `(threading, net delta)` to the brief's `\ / |` stroke
   table. A net delta of zero also covers cancelling overlapping packs and
-  twists, which render as Idle by design.
+  twists, which render as Idle by design. `draftActionLabel` maps the same
+  delta to the cell's action text (`F`, `B`, `.`) with the hole count appended
+  for multi-turn actions (`F2`, `B2`, …), per the user's clarification of
+  `webbrief.png`.
 - `rowLabel` produces the A/B/C… row labels of `webbrief.png`.
 - `expandDraftRows` repeats the *whole* pattern 1–4 times (clamped) and
   annotates each row with a `repeatIndex` so the view can draw the thicker
@@ -140,7 +143,7 @@ Computes the Stage 3 Weaving Draft rendering model for a pattern:
   object and any config change falls back to a full recompute.
 
 The shared `components/DraftChart/` renders the setup grid, the draft grid
-(SVG strokes, palette fills, repeat separators) and legend. Both
+(SVG strokes, action labels, palette fills, repeat separators) and legend. Both
 `pages/WeavingDraft/` (full view) and `pages/EditPattern/` (compact live
 preview panel beside the Picks grid) use it, so they cannot disagree about
 how a pick looks. `hooks/useDraftRows.ts` feeds the preview from the
