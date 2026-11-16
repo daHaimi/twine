@@ -70,6 +70,18 @@ test.describe('Weaving draft', () => {
     ])
   })
 
+  test('A4 margin presets update the injected @page rule', async ({ page }) => {
+    const pageRule = page.getByTestId('draft-page-margin-rule')
+    await expect.poll(() => pageRule.textContent()).toContain('size: A4 portrait')
+    await expect.poll(() => pageRule.textContent()).toContain('margin: 20mm')
+
+    const selector = page.getByLabel(/Margins/i)
+    await selector.selectOption('10')
+    await expect.poll(() => pageRule.textContent()).toContain('margin: 10mm')
+    await selector.selectOption('30')
+    await expect.poll(() => pageRule.textContent()).toContain('margin: 30mm')
+  })
+
   test('print media hides the controls but keeps both charts', async ({ page }) => {
     await page.emulateMedia({ media: 'print' })
     await expect(page.getByRole('button', { name: 'Print' })).toBeHidden()
@@ -82,7 +94,7 @@ test.describe('Weaving draft', () => {
     test.skip(testInfo.project.name === 'mobile-chromium', 'page.pdf() is unsupported under mobile emulation')
 
     await page.getByLabel(/Repetitions/i).selectOption('2')
-    const pdf = await page.pdf({ format: 'A4', printBackground: true })
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true })
     expect(pdf.length).toBeGreaterThan(1000)
     expect(pdf.subarray(0, 4).toString()).toBe('%PDF')
   })

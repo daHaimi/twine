@@ -12,9 +12,21 @@ export interface WeavingDraftPageProps {
   backTo: 'edit' | 'selection'
 }
 
+/** Commonly used A4 margin presets (mm on every side). */
+const PAGE_MARGIN_PRESETS = [
+  { label: 'None (0 mm)', mm: 0 },
+  { label: 'Narrow (10 mm)', mm: 10 },
+  { label: 'Normal (20 mm)', mm: 20 },
+  { label: 'Moderate (25 mm)', mm: 25 },
+  { label: 'Wide (30 mm)', mm: 30 },
+] as const
+
+const DEFAULT_MARGIN_MM = 20
+
 /**
  * "Weaving draft" state: renders the shared thread-path chart of
- * `webbrief.png` with a 1–4 repetition control and an A4 print action.
+ * `webbrief.png` with a 1–4 repetition control, selectable A4 page margins
+ * and a print action.
  * Rendering itself lives in `components/DraftChart` so the live preview in
  * the Edit Pattern page (Stage 4) shows exactly the same thing.
  */
@@ -24,6 +36,7 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
   const { pattern, loading, error, load } = useEditPatternStore()
 
   const [repetitions, setRepetitions] = useState(1)
+  const [marginMm, setMarginMm] = useState<number>(DEFAULT_MARGIN_MM)
   const draftRows = useDraftRows(pattern)
 
   useEffect(() => {
@@ -52,6 +65,9 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
 
   return (
     <main className={`${styles.page} twine-draft-page`}>
+      {/* `@page` cannot read CSS custom properties in Chromium, so the chosen
+          margin is injected as its own @page rule (later than print.css). */}
+      <style data-testid="draft-page-margin-rule">{`@page { size: A4 portrait; margin: ${marginMm}mm; }`}</style>
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <button
@@ -73,6 +89,18 @@ export function WeavingDraftPage({ backTo }: WeavingDraftPageProps) {
             >
               {[1, 2, 3, 4].map((n) => (
                 <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.repetitionControl}>
+            Margins:
+            <select
+              value={marginMm}
+              onChange={(event) => setMarginMm(Number(event.target.value))}
+              className={styles.select}
+            >
+              {PAGE_MARGIN_PRESETS.map((preset) => (
+                <option key={preset.mm} value={preset.mm}>{preset.label}</option>
               ))}
             </select>
           </label>

@@ -1,15 +1,15 @@
 /**
  * A4 print stylesheet for the Weaving Draft view only.
  *
- * Imported by WeavingDraftPage.tsx (and referenced from global.css). Page
- * geometry and "hide the app chrome" rules live here; draft-specific layout
- * tweaks live in WeavingDraftPage.module.css's own @media print block so they
- * can target the CSS-module class names directly.
+ * Imported by WeavingDraftPage.tsx (and referenced from global.css). The A4
+ * page size and "hide the app chrome" rules live here; the `@page` margin is
+ * injected by WeavingDraftPage from the user's chosen preset because CSS
+ * custom properties are not supported inside `@page` rules in Chromium.
+ * Draft-specific print sizing lives in DraftChart.module.css.
  */
 
 @page {
   size: A4 portrait;
-  margin: 12mm;
 }
 
 @media print {

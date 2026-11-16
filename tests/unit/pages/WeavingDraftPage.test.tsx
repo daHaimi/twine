@@ -70,6 +70,20 @@ describe('WeavingDraftPage', () => {
     expect(screen.getAllByTitle(/^Pick \d+$/)).toHaveLength(6)
   })
 
+  it('offers common A4 margin presets and injects the selected @page rule', async () => {
+    const pattern = await createNewPattern('Margins')
+    const { container } = renderDraft(pattern.id, 'edit')
+    await screen.findByText('Margins')
+
+    const selector = screen.getByLabelText(/Margins/i)
+    expect(selector).toHaveValue('20')
+    expect(container.querySelector('style')?.textContent).toContain('margin: 20mm')
+
+    await userEvent.selectOptions(selector, '30')
+    expect(container.querySelector('style')?.textContent).toContain('margin: 30mm')
+    expect(screen.getByRole('option', { name: 'Wide (30 mm)' })).toBeInTheDocument()
+  })
+
   it('marks a two-hole turn with a trailing 2 in the cell label', async () => {
     const base = await createNewPattern('TwoTurns')
     await savePattern({
