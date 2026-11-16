@@ -48,6 +48,7 @@ twine/
 │   ├── hooks/
 │   │   └── useDraftRows.ts     # Feeds the live preview from the incremental draft cache
 │   ├── components/
+│   │   ├── AppFooter/          # Site-wide free/no-data/no-ads note + PayPal coffee link
 │   │   ├── DraftChart/         # Shared thread-path chart renderer (full + preview views)
 │   │   └── PaletteSelect/      # Hole colour picker: palette swatches, coloured trigger field
 │   ├── storage/
@@ -249,7 +250,10 @@ test file that touches a store must reset its state in `beforeEach`.
 Both draft routes render the same `WeavingDraftPage`, parameterized by a
 `backTo` prop — this satisfies "from both other states, the Weaving draft
 can be accessed" while keeping a single back-navigation target per entry
-point.
+point. `App` renders a shared `components/AppFooter` alongside the router on
+every route; it carries the free/no-data/no-ads statement and a PayPal
+"Buy me a coffee" link, and uses the `twine-app-chrome` class so print output
+excludes it.
 
 Each page owns a CSS module with its own `@media (max-width: 640px)`
 (layout) and `@media (pointer: coarse)` (touch-target sizing, 44px minimum)
@@ -322,6 +326,8 @@ fallback, which the test suite relies on).
 - `cards-config.spec.ts`: the hole colour picker lists all palette swatches,
   assigns the chosen colour to the field (no rotation on repeated clicks),
   and supports clearing back to Unset.
+- `footer.spec.ts`: the free/no-data/no-ads statement and PayPal coffee link
+  appear on every route and the footer is hidden in print media.
 
 **Simulating a touch swipe:** use `locator.dispatchEvent('pointerdown' |
 'pointerup', { clientX, clientY, pointerId: 1, pointerType: 'touch' })`
