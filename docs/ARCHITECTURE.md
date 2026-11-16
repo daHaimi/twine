@@ -154,10 +154,12 @@ incremental cache; it is the React-side bridge to the pure domain functions.
 Print geometry lives in `pages/WeavingDraft/print.css`
 (`@page { size: A4 portrait }` + hiding app chrome) with chart print sizing in
 `DraftChart.module.css`. The A4 margin preset selector in `WeavingDraftPage`
-injects its own `@page { size: A4 portrait; margin: Nmm }` rule, since CSS
-custom properties are unreliable inside `@page` in Chromium; presets are 0,
-10, 20 (default), 25 and 30 mm. See decision #21 for the webbrief layout
-interpretation.
+injects its own `@page { size: A4 portrait; margin: Nmm }` rule into
+`document.head` (a `<style>` in `<body>` is ignored by some browsers' print
+pipelines, and CSS custom properties don't work inside `@page` in Chromium);
+presets are 0, 10, 20 (default), 25 and 30 mm. A UI hint explains that a
+browser print dialog set to "Margins: None" overrides the CSS margins. See
+decision #21 for the webbrief layout interpretation.
 
 ### `pickAction.ts`
 Drives the Picks-grid cell interaction model described in the brief
