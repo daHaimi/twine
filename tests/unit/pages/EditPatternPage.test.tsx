@@ -310,6 +310,38 @@ describe('EditPatternPage', () => {
     expect(cell).toHaveTextContent('F2')
   })
 
+  it('the live draft preview updates immediately when a pick cell changes', async () => {
+    const pattern = await createNewPattern('LivePreview')
+    renderPageFor(pattern.id)
+    await screen.findByDisplayValue('LivePreview')
+
+    expect(screen.getByRole('heading', { name: 'Live draft preview' })).toBeInTheDocument()
+    expect(screen.queryByTitle(/^Pick 1, card 1/)).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Add pick' }))
+    expect(screen.getByTitle('Pick 1, card 1, |')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Pick 1 card 1 action' }))
+    // S-threaded + Forward renders as '\' per the brief's direction table.
+    expect(screen.getByTitle('Pick 1, card 1, \\')).toBeInTheDocument()
+    expect(screen.queryByTitle('Pick 1, card 1, |')).not.toBeInTheDocument()
+  })
+
+  it('the live preview has a link to the full weaving draft', async () => {
+    const pattern = await createNewPattern('PreviewToDraft')
+    render(
+      <MemoryRouter initialEntries={[`/pattern/${pattern.id}`]}>
+        <Routes>
+          <Route path="/pattern/:patternId" element={<EditPatternPage />} />
+          <Route path="/pattern/:patternId/draft" element={<div>Full draft stub</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByDisplayValue('PreviewToDraft')
+    await userEvent.click(screen.getByRole('button', { name: /Open full draft/i }))
+    expect(await screen.findByText('Full draft stub')).toBeInTheDocument()
+  })
+
   it('a vertical swipe-up gesture on a pick cell jumps straight to F1, then F2, then wraps to Idle', async () => {
     const pattern = await createNewPattern('PickSwipe')
     renderPageFor(pattern.id)

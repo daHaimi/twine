@@ -1,0 +1,27 @@
+/**
+ * A4 print stylesheet for the Weaving Draft view only.
+ *
+ * Imported by WeavingDraftPage.tsx (and referenced from global.css). Page
+ * geometry and "hide the app chrome" rules live here; draft-specific layout
+ * tweaks live in WeavingDraftPage.module.css's own @media print block so they
+ * can target the CSS-module class names directly.
+ */
+
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Back/Repetitions/Print controls are screen-only. The defensive
+     .twine-app-chrome rule from global.css covers the other app pages. */
+  .twine-draft-noprint,
+  .twine-app-chrome {
+    display: none !important;
+  }
+}

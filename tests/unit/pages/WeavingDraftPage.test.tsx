@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { WeavingDraftPage } from '@/pages/WeavingDraft/WeavingDraftPage'
 import { resetDbConnectionForTests } from '@/storage/db'
-import { createNewPattern } from '@/storage/patternRepository'
+import { createDefaultCards, createNewPattern, savePattern } from '@/storage/patternRepository'
 import { useEditPatternStore } from '@/state/editPatternStore'
 
 beforeEach(async () => {
@@ -37,11 +37,33 @@ describe('WeavingDraftPage', () => {
     expect(await screen.findByText(/No pattern found/i)).toBeInTheDocument()
   })
 
-  it('loads and displays the pattern name and placeholder note', async () => {
+  it('loads and displays the pattern name and both draft charts', async () => {
     const pattern = await createNewPattern('Draft Target')
     renderDraft(pattern.id, 'edit')
     expect(await screen.findByText('Draft Target')).toBeInTheDocument()
-    expect(screen.getByText(/not implemented yet/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Threading & setup/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Weaving draft' })).toBeInTheDocument()
+    expect(screen.getByText(/Add picks in the Edit pattern view/i)).toBeInTheDocument()
+  })
+
+  it('renders thread strokes and repeats the whole pattern on request', async () => {
+    const base = await createNewPattern('Draft With Picks')
+    await savePattern({
+      ...base,
+      cards: createDefaultCards(2, 4).map((card) => ({ ...card, holeColours: [1, 2, 3, 4] })),
+      picks: [
+        { mode: 'Card', actions: new Map([['1', { type: 'Turn', dir: 'F', dist: 1 }]]) },
+        { mode: 'Card', actions: new Map([['2', { type: 'Turn', dir: 'B', dist: 1 }]]) },
+      ],
+    })
+
+    const { container } = renderDraft(base.id, 'edit')
+    expect(await screen.findByText('Draft With Picks')).toBeInTheDocument()
+    expect(container.querySelectorAll('svg line').length).toBeGreaterThan(0)
+    expect(screen.getAllByTitle(/^Pick \d+$/)).toHaveLength(2)
+
+    await userEvent.selectOptions(screen.getByLabelText(/Repetitions/i), '3')
+    expect(screen.getAllByTitle(/^Pick \d+$/)).toHaveLength(6)
   })
 
   it('"back" navigates to the Edit page when backTo="edit"', async () => {

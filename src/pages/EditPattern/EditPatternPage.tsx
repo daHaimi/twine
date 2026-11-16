@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { DraftChart } from '@/components/DraftChart/DraftChart'
 import { colourToCss, cssToColour } from '@/domain/gtt/colour'
 import { downloadPattern } from '@/domain/gtt/io'
 import type { Threading } from '@/domain/model/pattern'
@@ -9,6 +10,7 @@ import { LIMITS } from '@/domain/model/pattern'
 import { nextAssignedPaletteIndex } from '@/domain/paletteCycle'
 import type { PickGesture } from '@/domain/pickAction'
 import { actionLabel, gestureFromSwipe } from '@/domain/pickAction'
+import { useDraftRows } from '@/hooks/useDraftRows'
 import type { DestructiveChangePreview } from '@/state/editPatternStore'
 import { useEditPatternStore } from '@/state/editPatternStore'
 
@@ -74,6 +76,10 @@ export function EditPatternPage() {
   useEffect(() => {
     if (patternId) void load(patternId)
   }, [load, patternId])
+
+  // Live draft preview (Stage 4): incrementally refreshed from the current
+  // picks/cards, without replaying the whole pattern on every edit.
+  const previewRows = useDraftRows(pattern)
 
   // Adjust state during render (see https://react.dev/learn/you-might-not-need-an-effect)
   // rather than useEffect, to keep cardCountInput mirroring pattern.cards.length
@@ -447,109 +453,129 @@ export function EditPatternPage() {
 
       <section aria-labelledby="picks-heading" className={styles.section}>
         <h2 id="picks-heading">Picks</h2>
-        <div className={styles.cardsTableWrapper}>
-          <table className={styles.cardsTable}>
-            <thead>
-              <tr>
-                <th scope="row">Pick</th>
-                {pattern.cards.map((card) => (
-                  <th key={`c${card.number}`} scope="col">
-                    Card {card.number}
-                  </th>
-                ))}
-                {pattern.packs.map((pack) => (
-                  <th key={`p${pack.name}`} scope="col">
-                    {pack.name}
-                  </th>
-                ))}
-                <th scope="col" aria-label="Remove pick" />
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Start</th>
-                {pattern.cards.map((card) => {
-                  const packed = card.holeColours[0]
-                  return (
-                    <td key={`c${card.number}`}>
-                      <span
-                        aria-label={`Card ${card.number} starting colour`}
-                        className={packed !== undefined ? styles.holeCell : `${styles.holeCell} ${styles.holeCellUnset}`}
-                        style={{ background: packed !== undefined ? colourToCss(packed) : undefined }}
-                      >
-                        {packed ?? ''}
-                      </span>
-                    </td>
-                  )
-                })}
-                {pattern.packs.map((pack) => (
-                  <td key={`p${pack.name}`} className={styles.naCell} aria-hidden="true" />
-                ))}
-                <td />
-              </tr>
-              {pattern.picks.map((pick, pickIndex) => (
-                <tr key={pickIndex}>
-                  <th scope="row">{pickIndex + 1}</th>
-                  {pattern.cards.map((card) => {
-                    const isActiveMode = pick.mode === 'Card'
-                    const action = isActiveMode ? pick.actions.get(String(card.number)) : undefined
-                    return (
-                      <td key={`c${card.number}`}>
-                        <button
-                          type="button"
-                          aria-label={`Pick ${pickIndex + 1} card ${card.number} action`}
-                          className={isActiveMode ? styles.pickCellActive : styles.pickCellInactive}
-                          onPointerDown={handlePickPointerDown}
-                          onPointerUp={(e) =>
-                            handlePickPointerUp(e, (gesture) => requestCardAction(pickIndex, card.number, gesture))
-                          }
-                          onClick={() => handlePickClick((gesture) => requestCardAction(pickIndex, card.number, gesture))}
-                        >
-                          {isActiveMode ? actionLabel(action) : '—'}
-                        </button>
+        <div className={styles.picksLayout}>
+          <div className={styles.picksTableArea}>
+            <div className={styles.cardsTableWrapper}>
+              <table className={styles.cardsTable}>
+                <thead>
+                  <tr>
+                    <th scope="row">Pick</th>
+                    {pattern.cards.map((card) => (
+                      <th key={`c${card.number}`} scope="col">
+                        Card {card.number}
+                      </th>
+                    ))}
+                    {pattern.packs.map((pack) => (
+                      <th key={`p${pack.name}`} scope="col">
+                        {pack.name}
+                      </th>
+                    ))}
+                    <th scope="col" aria-label="Remove pick" />
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Start</th>
+                    {pattern.cards.map((card) => {
+                      const packed = card.holeColours[0]
+                      return (
+                        <td key={`c${card.number}`}>
+                          <span
+                            aria-label={`Card ${card.number} starting colour`}
+                            className={packed !== undefined ? styles.holeCell : `${styles.holeCell} ${styles.holeCellUnset}`}
+                            style={{ background: packed !== undefined ? colourToCss(packed) : undefined }}
+                          >
+                            {packed ?? ''}
+                          </span>
+                        </td>
+                      )
+                    })}
+                    {pattern.packs.map((pack) => (
+                      <td key={`p${pack.name}`} className={styles.naCell} aria-hidden="true" />
+                    ))}
+                    <td />
+                  </tr>
+                  {pattern.picks.map((pick, pickIndex) => (
+                    <tr key={pickIndex}>
+                      <th scope="row">{pickIndex + 1}</th>
+                      {pattern.cards.map((card) => {
+                        const isActiveMode = pick.mode === 'Card'
+                        const action = isActiveMode ? pick.actions.get(String(card.number)) : undefined
+                        return (
+                          <td key={`c${card.number}`}>
+                            <button
+                              type="button"
+                              aria-label={`Pick ${pickIndex + 1} card ${card.number} action`}
+                              className={isActiveMode ? styles.pickCellActive : styles.pickCellInactive}
+                              onPointerDown={handlePickPointerDown}
+                              onPointerUp={(e) =>
+                                handlePickPointerUp(e, (gesture) => requestCardAction(pickIndex, card.number, gesture))
+                              }
+                              onClick={() => handlePickClick((gesture) => requestCardAction(pickIndex, card.number, gesture))}
+                            >
+                              {isActiveMode ? actionLabel(action) : '—'}
+                            </button>
+                          </td>
+                        )
+                      })}
+                      {pattern.packs.map((pack) => {
+                        const isActiveMode = pick.mode === 'Pack'
+                        const action = isActiveMode ? pick.actions.get(pack.name) : undefined
+                        return (
+                          <td key={`p${pack.name}`}>
+                            <button
+                              type="button"
+                              aria-label={`Pick ${pickIndex + 1} pack ${pack.name} action`}
+                              className={isActiveMode ? styles.pickCellActive : styles.pickCellInactive}
+                              onPointerDown={handlePickPointerDown}
+                              onPointerUp={(e) =>
+                                handlePickPointerUp(e, (gesture) => requestPackAction(pickIndex, pack.name, gesture))
+                              }
+                              onClick={() => handlePickClick((gesture) => requestPackAction(pickIndex, pack.name, gesture))}
+                            >
+                              {isActiveMode ? actionLabel(action) : '—'}
+                            </button>
+                          </td>
+                        )
+                      })}
+                      <td>
+                        {pickIndex === pattern.picks.length - 1 && (
+                          <button
+                            type="button"
+                            className={styles.dangerButton}
+                            onClick={() => removePick(pickIndex)}
+                            aria-label={`Remove pick ${pickIndex + 1}`}
+                          >
+                            ✕
+                          </button>
+                        )}
                       </td>
-                    )
-                  })}
-                  {pattern.packs.map((pack) => {
-                    const isActiveMode = pick.mode === 'Pack'
-                    const action = isActiveMode ? pick.actions.get(pack.name) : undefined
-                    return (
-                      <td key={`p${pack.name}`}>
-                        <button
-                          type="button"
-                          aria-label={`Pick ${pickIndex + 1} pack ${pack.name} action`}
-                          className={isActiveMode ? styles.pickCellActive : styles.pickCellInactive}
-                          onPointerDown={handlePickPointerDown}
-                          onPointerUp={(e) =>
-                            handlePickPointerUp(e, (gesture) => requestPackAction(pickIndex, pack.name, gesture))
-                          }
-                          onClick={() => handlePickClick((gesture) => requestPackAction(pickIndex, pack.name, gesture))}
-                        >
-                          {isActiveMode ? actionLabel(action) : '—'}
-                        </button>
-                      </td>
-                    )
-                  })}
-                  <td>
-                    {pickIndex === pattern.picks.length - 1 && (
-                      <button
-                        type="button"
-                        className={styles.dangerButton}
-                        onClick={() => removePick(pickIndex)}
-                        aria-label={`Remove pick ${pickIndex + 1}`}
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button type="button" onClick={addPick} disabled={pattern.picks.length >= LIMITS.MAX_PICKS}>
+              Add pick
+            </button>
+          </div>
+
+          <aside className={styles.previewPanel} aria-labelledby="draft-preview-heading">
+            <h3 id="draft-preview-heading">Live draft preview</h3>
+            <p className={styles.previewHint}>Updates as you edit the picks.</p>
+            <DraftChart
+              pattern={pattern}
+              rows={previewRows}
+              showSetup={false}
+              showHeadings={false}
+              showLegend={false}
+              compact
+            />
+            <button type="button" onClick={() => navigate(`/pattern/${pattern.id}/draft`)}>
+              Open full draft →
+            </button>
+          </aside>
         </div>
-        <button type="button" onClick={addPick} disabled={pattern.picks.length >= LIMITS.MAX_PICKS}>
-          Add pick
-        </button>
       </section>
 
       {pending && (
