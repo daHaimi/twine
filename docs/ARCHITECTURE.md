@@ -48,7 +48,8 @@ twine/
 │   ├── hooks/
 │   │   └── useDraftRows.ts     # Feeds the live preview from the incremental draft cache
 │   ├── components/
-│   │   └── DraftChart/         # Shared thread-path chart renderer (full + preview views)
+│   │   ├── DraftChart/         # Shared thread-path chart renderer (full + preview views)
+│   │   └── PaletteSelect/      # Hole colour picker: palette swatches, coloured trigger field
 │   ├── storage/
 │   │   ├── db.ts               # IndexedDB schema + shared connection (idb)
 │   │   └── patternRepository.ts # Pattern CRUD, default-pattern factory
@@ -185,6 +186,8 @@ later stages.
 Pure codec between GTT's packed `0x00BBGGRR` integer colour format (byte 0
 = R, byte 1 = G, byte 2 = B, byte 3 unused — the Delphi `TColor`/COLORREF
 convention) and CSS `#RRGGBB` strings, fuzz-tested for round-trip fidelity.
+`readableTextColour` also picks black or white text for a packed colour so
+palette swatches and colour-filled fields stay legible.
 
 ## Storage layer
 
@@ -246,6 +249,15 @@ Each page owns a CSS module with its own `@media (max-width: 640px)`
 rules, per the brief's responsive-design requirement — there is no
 separate "mobile" component tree; the same markup adapts via CSS.
 
+### Hole colour assignment (`PaletteSelect.tsx`)
+The Cards table's hole cells use a palette picker instead of the old
+click-to-cycle behaviour (removed with `domain/paletteCycle.ts`): the field
+shows the selected colour and its index, and clicking it opens a popover
+listing "Unset" plus all 16 palette slots as colour swatches. Unset slots are
+disabled (they cannot be assigned), selection closes the popover, and Escape
+or an outside click dismisses it. The same component is used for every hole
+of every card, so the selection UI is identical everywhere.
+
 ### Pointer/gesture wiring (`EditPatternPage.tsx`)
 The Picks grid's cell buttons track `pointerdown`/`pointerup` coordinates
 and feed the delta into `gestureFromSwipe` + `applyGesture` from
@@ -300,6 +312,9 @@ fallback, which the test suite relies on).
 - `draft-preview.spec.ts`: the live preview updates immediately on pick edits
   (including a later pick, exercising the incremental path) and links to the
   full draft view, on both desktop and mobile.
+- `cards-config.spec.ts`: the hole colour picker lists all palette swatches,
+  assigns the chosen colour to the field (no rotation on repeated clicks),
+  and supports clearing back to Unset.
 
 **Simulating a touch swipe:** use `locator.dispatchEvent('pointerdown' |
 'pointerup', { clientX, clientY, pointerId: 1, pointerType: 'touch' })`
