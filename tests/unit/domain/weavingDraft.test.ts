@@ -10,7 +10,8 @@ import {
   draftActionLabel,
   draftSymbol,
   expandDraftRows,
-  rowLabel,
+  holeLabel,
+  pickRowLabel,
   updateDraftCache,
 } from '@/domain/weavingDraft'
 
@@ -144,18 +145,38 @@ describe('draftActionLabel', () => {
   })
 })
 
-describe('rowLabel', () => {
-  it('labels the first 26 rows A..Z then falls back to numbers', () => {
-    expect(rowLabel(0)).toBe('A')
-    expect(rowLabel(3)).toBe('D')
-    expect(rowLabel(25)).toBe('Z')
-    expect(rowLabel(26)).toBe('27')
+describe('holeLabel', () => {
+  it('labels the first 26 holes A..Z then falls back to numbers', () => {
+    expect(holeLabel(0)).toBe('A')
+    expect(holeLabel(3)).toBe('D')
+    expect(holeLabel(25)).toBe('Z')
+    expect(holeLabel(26)).toBe('27')
   })
 
   it('never returns an empty label (fuzz)', () => {
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 10_000 }), (index) => {
-        expect(rowLabel(index).length).toBeGreaterThan(0)
+        expect(holeLabel(index).length).toBeGreaterThan(0)
+      }),
+    )
+  })
+})
+
+describe('pickRowLabel', () => {
+  it('numbers picks from 1 and wraps after the pattern length', () => {
+    expect(pickRowLabel(0, 7)).toBe('1')
+    expect(pickRowLabel(6, 7)).toBe('7')
+    expect(pickRowLabel(7, 7)).toBe('1')
+    expect(pickRowLabel(8, 7)).toBe('2')
+  })
+
+  it('always stays within 1..pickCount (fuzz)', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 1, max: 128 }), fc.nat({ max: 10_000 }), (count, index) => {
+        const label = Number(pickRowLabel(index, count))
+        expect(label).toBeGreaterThanOrEqual(1)
+        expect(label).toBeLessThanOrEqual(count)
+        expect(label).toBe((index % count) + 1)
       }),
     )
   })
@@ -167,13 +188,20 @@ describe('computeDraftRows', () => {
     expect(computeDraftRows(makePattern({ cards: [], picks: [makePick()] }))).toEqual([])
   })
 
-  it('creates one row per pick with cycling A/B/C/D labels', () => {
+  it('creates one row per pick with 1-based pick numbers', () => {
     const rows = computeDraftRows(
       makePattern({ picks: Array.from({ length: 6 }, () => makePick()) }),
     )
     expect(rows.map((r) => r.pickIndex)).toEqual([1, 2, 3, 4, 5, 6])
-    expect(rows.map((r) => r.label)).toEqual(['A', 'B', 'C', 'D', 'A', 'B'])
+    expect(rows.map((r) => r.label)).toEqual(['1', '2', '3', '4', '5', '6'])
     expect(rows.every((r) => r.cards.length === 2)).toBe(true)
+  })
+
+  it('uses the pattern length as the label cycle (7 picks -> 1..7)', () => {
+    const rows = computeDraftRows(
+      makePattern({ picks: Array.from({ length: 7 }, () => makePick()) }),
+    )
+    expect(rows.map((r) => r.label)).toEqual(['1', '2', '3', '4', '5', '6', '7'])
   })
 
   it('maps turn direction and threading to the right symbol', () => {

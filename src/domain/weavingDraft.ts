@@ -5,8 +5,8 @@ import { resolveCardDelta } from '@/domain/simulation'
  * Weaving-draft rendering model.
  *
  * The draft is a thread-path chart in the style of `webbrief.png`: each row
- * is one pick (labelled A, B, C, … like the hole positions in the reference
- * chart), each column is a card, the cell fill is the colour of the thread
+ * is one pick (labelled with its number within the pattern, wrapping back to
+ * 1 for the next repetition), each column is a card, the cell fill is the colour of the thread
  * currently at that card's weaving position, and a diagonal/vertical stroke
  * shows the direction that card turns in that pick.
  *
@@ -101,11 +101,20 @@ export function draftActionLabel(delta: number): string {
 const ROW_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 /**
- * Row label for a hole index, following the A/B/C/D labels of webbrief.png.
- * Beyond Z the label falls back to a 1-based number.
+ * Label for a hole row in the setup grid, following the A/B/C/D labels of
+ * webbrief.png. Beyond Z it falls back to a 1-based number.
  */
-export function rowLabel(holeIndex: number): string {
+export function holeLabel(holeIndex: number): string {
   return ROW_LABELS[holeIndex] ?? String(holeIndex + 1)
+}
+
+/**
+ * Label for a draft row: the 1-based pick number within the pattern,
+ * wrapping back to 1 after `pickCount` picks. Each displayed repetition of
+ * the pattern therefore starts again at 1 (per user clarification).
+ */
+export function pickRowLabel(pickIndex: number, pickCount: number): string {
+  return String((pickIndex % pickCount) + 1)
 }
 
 /** Core computation: rows for picks `[fromPickIndex..]`, resuming from `initialPositions`. */
@@ -114,7 +123,6 @@ function computeRows(pattern: Pattern, fromPickIndex: number, initialPositions: 
   if (cards.length === 0) return []
 
   const positions = [...initialPositions]
-  const firstCardHoles = cards[0].holes
 
   return picks.slice(fromPickIndex).map((pick, offset) => {
     const pickIndex = fromPickIndex + offset
@@ -138,9 +146,7 @@ function computeRows(pattern: Pattern, fromPickIndex: number, initialPositions: 
 
     return {
       pickIndex: pickIndex + 1,
-      // The reference chart cycles A,B,C,D with each successive pick of a
-      // 4-hole card; use the first card's hole count as the cycle length.
-      label: rowLabel(pickIndex % firstCardHoles),
+      label: pickRowLabel(pickIndex, picks.length),
       cards: cells,
     }
   })

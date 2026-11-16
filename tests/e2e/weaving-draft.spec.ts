@@ -56,6 +56,20 @@ test.describe('Weaving draft', () => {
     await expect(page.getByTitle(/^Pick 1$/)).toHaveCount(4)
   })
 
+  test('labels rows 1..N and restarts at 1 for each repetition', async ({ page }) => {
+    // The shared setup left us on the draft with one pick; go back and add six more.
+    await page.getByRole('button', { name: /Back to Edit pattern/ }).click()
+    for (let i = 0; i < 6; i++) await page.getByRole('button', { name: 'Add pick' }).click()
+    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: /Weaving draft/ }).click()
+
+    await page.getByLabel(/Repetitions/i).selectOption('2')
+    expect(await page.getByTitle(/^Pick \d+$/).allTextContents()).toEqual([
+      '1', '2', '3', '4', '5', '6', '7',
+      '1', '2', '3', '4', '5', '6', '7',
+    ])
+  })
+
   test('print media hides the controls but keeps both charts', async ({ page }) => {
     await page.emulateMedia({ media: 'print' })
     await expect(page.getByRole('button', { name: 'Print' })).toBeHidden()

@@ -1,7 +1,7 @@
 import { colourToCss } from '@/domain/gtt/colour'
 import type { Palette, Pattern } from '@/domain/model/pattern'
 import type { DraftRow, DraftSymbol } from '@/domain/weavingDraft'
-import { expandDraftRows, rowLabel } from '@/domain/weavingDraft'
+import { expandDraftRows, holeLabel } from '@/domain/weavingDraft'
 
 import styles from './DraftChart.module.css'
 
@@ -87,7 +87,7 @@ export function DraftChart({
               <tbody>
                 {holeRows.map((holeIndex) => (
                   <tr key={holeIndex}>
-                    <th className={styles.rowHeader}>{rowLabel(holeIndex)}</th>
+                    <th className={styles.rowHeader}>{holeLabel(holeIndex)}</th>
                     {pattern.cards.map((card) => {
                       const colour = paletteColour(pattern.palette, card.holeColours[holeIndex])
                       return (
@@ -95,7 +95,7 @@ export function DraftChart({
                           <div
                             className={`${styles.colourCell} ${colour ? '' : styles.unsetCell}`}
                             style={colour ? { background: colour } : undefined}
-                            title={`Card ${card.number}, hole ${rowLabel(holeIndex)}`}
+                            title={`Card ${card.number}, hole ${holeLabel(holeIndex)}`}
                           />
                         </td>
                       )
