@@ -39,6 +39,20 @@ export function colourToCss(packed: number): string {
 }
 
 /**
+ * Picks black or white text for maximum contrast against a packed GTT
+ * colour, using a simple perceived-brightness (Rec. 601 luminance) test.
+ * Used by palette swatches and colour-filled fields so their index label
+ * stays readable over both light and dark dyes.
+ */
+export function readableTextColour(packed: number): string {
+  const r = packed & BYTE_MASK
+  const g = (packed >> 8) & BYTE_MASK
+  const b = (packed >> 16) & BYTE_MASK
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 0xff
+  return luminance > 0.55 ? '#000000' : '#ffffff'
+}
+
+/**
  * Converts a CSS `#rrggbb` (or `#RRGGBB`) hex colour string into a GTT
  * packed colour integer (`0x00BBGGRR`).
  *

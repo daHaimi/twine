@@ -3,11 +3,11 @@ import type { PointerEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { DraftChart } from '@/components/DraftChart/DraftChart'
+import { PaletteSelect } from '@/components/PaletteSelect/PaletteSelect'
 import { colourToCss, cssToColour } from '@/domain/gtt/colour'
 import { downloadPattern } from '@/domain/gtt/io'
 import type { Threading } from '@/domain/model/pattern'
 import { LIMITS } from '@/domain/model/pattern'
-import { nextAssignedPaletteIndex } from '@/domain/paletteCycle'
 import type { PickGesture } from '@/domain/pickAction'
 import { actionLabel, gestureFromSwipe } from '@/domain/pickAction'
 import { useDraftRows } from '@/hooks/useDraftRows'
@@ -343,21 +343,15 @@ export function EditPatternPage() {
                     if (holeIdx >= card.holes) {
                       return <td key={card.number} className={styles.naCell} aria-hidden="true" />
                     }
-                    const packed = card.holeColours[holeIdx]
                     const holeLabel = HOLE_LETTERS[holeIdx] ?? String(holeIdx + 1)
                     return (
                       <td key={card.number}>
-                        <button
-                          type="button"
-                          aria-label={`Card ${card.number} hole ${holeLabel} colour`}
-                          className={packed !== undefined ? styles.holeCell : `${styles.holeCell} ${styles.holeCellUnset}`}
-                          style={{ background: packed !== undefined ? colourToCss(packed) : undefined }}
-                          onClick={() =>
-                            setHoleColour(card.number, holeIdx, nextAssignedPaletteIndex(pattern.palette.colours, packed))
-                          }
-                        >
-                          {packed ?? ''}
-                        </button>
+                        <PaletteSelect
+                          palette={pattern.palette}
+                          value={card.holeColours[holeIdx]}
+                          onChange={(index) => setHoleColour(card.number, holeIdx, index)}
+                          label={`Card ${card.number} hole ${holeLabel} colour`}
+                        />
                       </td>
                     )
                   })}

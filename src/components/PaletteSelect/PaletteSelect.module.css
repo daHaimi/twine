@@ -1,0 +1,103 @@
+.root {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.trigger {
+  width: 100%;
+  min-width: 2.6rem;
+  min-height: 1.85rem;
+  border: 1px solid var(--twine-border);
+  border-radius: 4px;
+  padding: 0.15rem 0.25rem;
+  font-family: var(--twine-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.trigger:hover {
+  border-color: var(--twine-accent);
+}
+
+.unset {
+  background-color: var(--twine-surface-raised);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--twine-border) 0,
+    var(--twine-border) 2px,
+    transparent 2px,
+    transparent 8px
+  );
+  color: var(--twine-text-muted);
+}
+
+.popover {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--twine-surface);
+  border: 1px solid var(--twine-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--twine-shadow);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 28px);
+  gap: 4px;
+}
+
+.option {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--twine-border);
+  border-radius: 4px;
+  font-family: var(--twine-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.popover > .option {
+  width: 100%;
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--twine-accent);
+}
+
+.option[aria-selected='true'] {
+  outline: 2px solid var(--twine-accent);
+  outline-offset: 1px;
+}
+
+.option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (pointer: coarse) {
+  .trigger,
+  .option {
+    min-height: 44px;
+  }
+
+  .option {
+    min-width: 44px;
+  }
+}

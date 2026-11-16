@@ -1,7 +1,13 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 
-import { colourToCss, cssToColour, MAX_PACKED_COLOUR, MIN_PACKED_COLOUR } from '@/domain/gtt/colour'
+import {
+  colourToCss,
+  cssToColour,
+  MAX_PACKED_COLOUR,
+  MIN_PACKED_COLOUR,
+  readableTextColour,
+} from '@/domain/gtt/colour'
 
 describe('colourToCss', () => {
   it('converts known reference values correctly (0x00BBGGRR -> #rrggbb)', () => {
@@ -44,6 +50,25 @@ describe('cssToColour', () => {
     expect(() => cssToColour('not-a-colour')).toThrow(SyntaxError)
     expect(() => cssToColour('#fff')).toThrow(SyntaxError)
     expect(() => cssToColour('#gggggg')).toThrow(SyntaxError)
+  })
+})
+
+describe('readableTextColour', () => {
+  it('uses dark text on light colours and light text on dark colours', () => {
+    expect(readableTextColour(0xffffff)).toBe('#000000') // white
+    expect(readableTextColour(cssToColour('#e3d5b8'))).toBe('#000000') // undyed wool
+    expect(readableTextColour(cssToColour('#c9a227'))).toBe('#000000') // weld yellow
+    expect(readableTextColour(0)).toBe('#ffffff') // black
+    expect(readableTextColour(cssToColour('#2d4f6c'))).toBe('#ffffff') // woad blue
+    expect(readableTextColour(cssToColour('#a33b20'))).toBe('#ffffff') // madder red
+  })
+
+  it('always returns exactly black or white (fuzz)', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: MIN_PACKED_COLOUR, max: MAX_PACKED_COLOUR }), (packed) => {
+        expect(['#000000', '#ffffff']).toContain(readableTextColour(packed))
+      }),
+    )
   })
 })
 

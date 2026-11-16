@@ -158,31 +158,48 @@ describe('EditPatternPage', () => {
     expect(screen.queryByText('MyPack', { selector: 'strong' })).not.toBeInTheDocument()
   })
 
-  it('clicking a hole colour cell cycles it through assigned palette colours', async () => {
+  it('the hole colour picker shows the palette with its colours and assigns the chosen one', async () => {
     const pattern = await createNewPattern('HoleColours')
     renderPageFor(pattern.id)
     await screen.findByDisplayValue('HoleColours')
 
     const cell = screen.getByRole('button', { name: 'Card 1 hole A colour' })
-    expect(cell).toHaveTextContent('')
+    expect(cell).toHaveTextContent('–')
 
     await userEvent.click(cell)
-    expect(cell).toHaveTextContent('1')
+    const listbox = screen.getByRole('listbox')
+    expect(listbox).toBeInTheDocument()
+    // One "Unset" option plus all 16 palette slots (scope to the popover:
+    // the cards' threading <select>s also expose native options).
+    expect(within(listbox).getAllByRole('option')).toHaveLength(17)
+    // Default palette slots 1-4 are assigned and shown in their actual colours;
+    // the remaining slots are unset and therefore not selectable.
+    expect(within(listbox).getByRole('option', { name: 'Select palette colour 1' })).toHaveStyle({ backgroundColor: '#e3d5b8' })
+    expect(within(listbox).getByRole('option', { name: 'Select palette colour 5' })).toBeDisabled()
 
-    const otherCell = screen.getByRole('button', { name: 'Card 2 hole A colour' })
-    expect(otherCell).toHaveTextContent('')
+    await userEvent.click(within(listbox).getByRole('option', { name: 'Select palette colour 3' }))
+    expect(cell).toHaveTextContent('3')
+    expect(cell).toHaveStyle({ backgroundColor: '#2d4f6c' })
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+
+    // Other holes are unaffected.
+    expect(screen.getByRole('button', { name: 'Card 2 hole A colour' })).toHaveTextContent('–')
   })
 
-  it('a hole colour cell completes the full cycle through all assigned palette slots and back to unset', async () => {
-    const pattern = await createNewPattern('HoleColourFullCycle')
+  it('choosing Unset clears a previously assigned hole colour', async () => {
+    const pattern = await createNewPattern('HoleColourUnset')
     renderPageFor(pattern.id)
-    await screen.findByDisplayValue('HoleColourFullCycle')
+    await screen.findByDisplayValue('HoleColourUnset')
 
     const cell = screen.getByRole('button', { name: 'Card 1 hole A colour' })
-    for (const expected of ['1', '2', '3', '4', '']) {
-      await userEvent.click(cell)
-      expect(cell).toHaveTextContent(expected)
-    }
+    await userEvent.click(cell)
+    await userEvent.click(within(screen.getByRole('listbox')).getByRole('option', { name: 'Select palette colour 2' }))
+    expect(cell).toHaveTextContent('2')
+
+    await userEvent.click(cell)
+    await userEvent.click(within(screen.getByRole('listbox')).getByRole('option', { name: 'Unset' }))
+    expect(cell).toHaveTextContent('–')
+    expect(cell).not.toHaveStyle({ backgroundColor: '#a33b20' })
   })
 
   it('unsetting a palette colour disables its colour input', async () => {
