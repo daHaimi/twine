@@ -141,6 +141,7 @@ export function DraftChart({
                               title={`Pick ${entry.row.pickIndex}, card ${cell.cardNumber}, ${cell.symbol}`}
                             >
                               <SymbolStroke symbol={cell.symbol} />
+                              <span className={styles.actionLabel}>{cell.actionLabel}</span>
                             </div>
                           </td>
                         )
@@ -161,6 +162,7 @@ export function DraftChart({
               <span className={styles.legendItem}><span className={styles.legendGlyph}><SymbolStroke symbol={'\\'} /></span> S forward / Z backward</span>
               <span className={styles.legendItem}><span className={styles.legendGlyph}><SymbolStroke symbol="/" /></span> Z forward / S backward</span>
             </div>
+            <p className={styles.legendNote}>Cell text: F = forward, B = backward, . = idle; a trailing number means that many holes are turned.</p>
           </div>
         )}
       </section>

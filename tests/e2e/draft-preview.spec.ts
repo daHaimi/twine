@@ -35,6 +35,7 @@ test.describe('Live draft preview', () => {
     await page.getByRole('button', { name: 'Pick 1 card 1 action' }).click()
     // S-threaded + Forward -> '\' (brief's direction table).
     await expect(page.getByTitle('Pick 1, card 1, \\')).toBeVisible()
+    await expect(page.getByTitle('Pick 1, card 1, \\')).toHaveText('F')
     await expect(page.getByTitle('Pick 1, card 1, |')).toHaveCount(0)
 
     await page.getByRole('button', { name: /Open full draft/i }).click()

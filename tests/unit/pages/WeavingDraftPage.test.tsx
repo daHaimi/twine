@@ -61,9 +61,25 @@ describe('WeavingDraftPage', () => {
     expect(await screen.findByText('Draft With Picks')).toBeInTheDocument()
     expect(container.querySelectorAll('svg line').length).toBeGreaterThan(0)
     expect(screen.getAllByTitle(/^Pick \d+$/)).toHaveLength(2)
+    // Every draft cell shows its action in addition to the direction stroke.
+    expect(screen.getByTitle('Pick 1, card 1, \\')).toHaveTextContent('F')
+    expect(screen.getByTitle('Pick 2, card 2, /')).toHaveTextContent('B')
+    expect(screen.getByTitle('Pick 1, card 2, |')).toHaveTextContent('.')
 
     await userEvent.selectOptions(screen.getByLabelText(/Repetitions/i), '3')
     expect(screen.getAllByTitle(/^Pick \d+$/)).toHaveLength(6)
+  })
+
+  it('marks a two-hole turn with a trailing 2 in the cell label', async () => {
+    const base = await createNewPattern('TwoTurns')
+    await savePattern({
+      ...base,
+      cards: createDefaultCards(1, 4),
+      picks: [{ mode: 'Card', actions: new Map([['1', { type: 'Turn', dir: 'F', dist: 2 }]]) }],
+    })
+    renderDraft(base.id, 'edit')
+    expect(await screen.findByText('TwoTurns')).toBeInTheDocument()
+    expect(screen.getByTitle('Pick 1, card 1, \\')).toHaveTextContent('F2')
   })
 
   it('"back" navigates to the Edit page when backTo="edit"', async () => {

@@ -41,6 +41,8 @@ test.describe('Weaving draft', () => {
     await expect(page.getByRole('heading', { name: /Threading & setup/ })).toBeVisible()
     expect(await page.locator('svg line').count()).toBeGreaterThan(0)
     await expect(page.getByTitle(/^Pick 1, card 1/)).toHaveAttribute('title', /\\/)
+    await expect(page.getByTitle(/^Pick 1, card 1/)).toHaveText('F')
+    await expect(page.getByTitle(/^Pick 1, card 2/)).toHaveText('.')
   })
 
   test('repeats the whole pattern 1-4 times', async ({ page }) => {

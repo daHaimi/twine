@@ -30,6 +30,8 @@ export interface DraftCardCell {
   delta: number
   /** Direction stroke derived from `threading` and `delta`. */
   symbol: DraftSymbol
+  /** Action text shown inside the cell: F/B/. plus the hole count for multi-hole turns. */
+  actionLabel: string
   /** Palette index of the thread at the weaving position (undefined = unset). */
   colourIndex: number | undefined
   /**
@@ -81,6 +83,21 @@ export function draftSymbol(threading: Threading, delta: number): DraftSymbol {
   return forward ? '/' : '\\'
 }
 
+/**
+ * Action text for a draft cell, as noted in `webbrief.png`: `F` (forward),
+ * `B` (backward) or `.` (idle), with the hole count appended when more than
+ * one turn must be done (e.g. `F2`, `B2`). The count comes from the absolute
+ * net delta, so overlapping packs that turn the same way also show the
+ * combined number; cancelling turns and twists show `.` because they have no
+ * positional effect in this version.
+ */
+export function draftActionLabel(delta: number): string {
+  if (delta === 0) return '.'
+  const direction = delta > 0 ? 'F' : 'B'
+  const distance = Math.abs(delta)
+  return distance === 1 ? direction : `${direction}${distance}`
+}
+
 const ROW_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 /**
@@ -113,6 +130,7 @@ function computeRows(pattern: Pattern, fromPickIndex: number, initialPositions: 
         threading: card.threading,
         delta,
         symbol: draftSymbol(card.threading, delta),
+        actionLabel: draftActionLabel(delta),
         colourIndex,
         positionAfter,
       }

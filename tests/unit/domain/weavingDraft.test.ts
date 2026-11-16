@@ -7,6 +7,7 @@ import {
   buildDraftCache,
   computeDraftRows,
   computeDraftRowsFrom,
+  draftActionLabel,
   draftSymbol,
   expandDraftRows,
   rowLabel,
@@ -117,6 +118,32 @@ describe('draftSymbol', () => {
   })
 })
 
+describe('draftActionLabel', () => {
+  it('shows F/B/. and the number of holes when more than one turn is needed', () => {
+    expect(draftActionLabel(0)).toBe('.')
+    expect(draftActionLabel(1)).toBe('F')
+    expect(draftActionLabel(2)).toBe('F2')
+    expect(draftActionLabel(3)).toBe('F3')
+    expect(draftActionLabel(-1)).toBe('B')
+    expect(draftActionLabel(-2)).toBe('B2')
+    expect(draftActionLabel(-4)).toBe('B4')
+  })
+
+  it('never omits the direction for any net delta (fuzz)', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: -20, max: 20 }), (delta) => {
+        const label = draftActionLabel(delta)
+        if (delta === 0) {
+          expect(label).toBe('.')
+        } else {
+          expect(label.startsWith(delta > 0 ? 'F' : 'B')).toBe(true)
+          if (Math.abs(delta) > 1) expect(label).toBe(`${delta > 0 ? 'F' : 'B'}${Math.abs(delta)}`)
+        }
+      }),
+    )
+  })
+})
+
 describe('rowLabel', () => {
   it('labels the first 26 rows A..Z then falls back to numbers', () => {
     expect(rowLabel(0)).toBe('A')
@@ -214,6 +241,7 @@ describe('computeDraftRows', () => {
               expect(cell.delta).toBe(delta)
               expect(cell.cardNumber).toBe(card.number)
               expect(cell.symbol).toBe(draftSymbol(card.threading, delta))
+              expect(cell.actionLabel).toBe(draftActionLabel(delta))
               const expectedColour = card.holeColours[(((-positions[ci]) % card.holes) + card.holes) % card.holes]
               expect(cell.colourIndex).toBe(expectedColour)
               positions[ci] = ((positions[ci] + delta) % card.holes + card.holes) % card.holes

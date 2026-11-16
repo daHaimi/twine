@@ -94,6 +94,28 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* The action label sits above the stroke on a light badge so it stays
+   readable over both saturated thread colours and hatched empty cells. */
+.actionLabel {
+  position: absolute;
+  z-index: 1;
+  font-family: var(--twine-font-mono);
+  font-size: 0.72em;
+  font-weight: 700;
+  line-height: 1;
+  color: #000000;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 3px;
+  padding: 1px 2px;
+  pointer-events: none;
+}
+
+.legendNote {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--twine-text-muted);
+}
+
 .repeatBoundary td,
 .repeatBoundary th {
   border-top: 3px solid var(--twine-text);
@@ -170,9 +192,18 @@
   padding: 0.1rem 0.2rem;
 }
 
+.compact .actionLabel {
+  font-size: 0.7em;
+  padding: 0 1px;
+}
+
 .compact .legendItems {
   font-size: 0.72rem;
   gap: 0.3rem 0.8rem;
+}
+
+.compact .legendNote {
+  font-size: 0.7rem;
 }
 
 .compact .legendGlyph {
