@@ -38,6 +38,15 @@ describe('App routing', () => {
     expect(await screen.findByText('PatternSelectionPage stub')).toBeInTheDocument()
   })
 
+  it('renders the free-to-use footer with a PayPal coffee link on every route', async () => {
+    await renderAppAt('/')
+    expect(await screen.findByText(/TWINE is free to use/i)).toBeInTheDocument()
+    expect(screen.getByText(/If you like it, please buy me a coffee/i)).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: /Buy me a coffee/i })
+    expect(link).toHaveAttribute('href', 'https://www.paypal.me/tungavp')
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
   it('redirects unknown paths back to "/"', async () => {
     await renderAppAt('/this/does/not/exist')
     expect(await screen.findByText('PatternSelectionPage stub')).toBeInTheDocument()

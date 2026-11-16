@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
+import { AppFooter } from '@/components/AppFooter/AppFooter'
 import { EditPatternPage } from '@/pages/EditPattern/EditPatternPage'
 import { PatternSelectionPage } from '@/pages/PatternSelection/PatternSelectionPage'
 import { WeavingDraftPage } from '@/pages/WeavingDraft/WeavingDraftPage'
@@ -26,5 +27,10 @@ const router = createBrowserRouter([
 ])
 
 export function App() {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <RouterProvider router={router} />
+      <AppFooter />
+    </>
+  )
 }

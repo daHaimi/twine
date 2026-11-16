@@ -1,0 +1,44 @@
+.footer {
+  width: 100%;
+  border-top: 1px solid var(--twine-border);
+  background: var(--twine-surface);
+  color: var(--twine-text-muted);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.statement,
+.request {
+  margin: 0;
+}
+
+.coffeeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+  padding: 0.5rem 0.9rem;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: var(--twine-accent);
+  color: var(--twine-accent-contrast);
+  border: 1px solid var(--twine-accent);
+}
+
+.coffeeButton:hover {
+  background: var(--twine-accent-hover);
+  border-color: var(--twine-accent-hover);
+}
+
+@media (pointer: coarse) {
+  .coffeeButton {
+    min-height: 44px;
+  }
+}
