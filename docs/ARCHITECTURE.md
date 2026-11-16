@@ -153,7 +153,10 @@ how a pick looks. `hooks/useDraftRows.ts` feeds the preview from the
 incremental cache; it is the React-side bridge to the pure domain functions.
 Print geometry lives in `pages/WeavingDraft/print.css`
 (`@page { size: A4 portrait }` + hiding app chrome) with chart print sizing in
-`DraftChart.module.css`. See decision #21 for the webbrief layout
+`DraftChart.module.css`. The A4 margin preset selector in `WeavingDraftPage`
+injects its own `@page { size: A4 portrait; margin: Nmm }` rule, since CSS
+custom properties are unreliable inside `@page` in Chromium; presets are 0,
+10, 20 (default), 25 and 30 mm. See decision #21 for the webbrief layout
 interpretation.
 
 ### `pickAction.ts`
