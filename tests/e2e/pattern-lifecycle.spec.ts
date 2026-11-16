@@ -40,7 +40,7 @@ test.describe('Pattern lifecycle', () => {
     await page.getByRole('button', { name: 'Create new pattern' }).click()
 
     // Navigated into the Edit Pattern page.
-    const nameInput = page.getByLabel('Pattern name')
+    const nameInput = page.getByLabel('Pattern name', { exact: true })
     await expect(nameInput).toHaveValue('E2E Pattern')
 
     await nameInput.fill('E2E Pattern Renamed')
@@ -50,7 +50,7 @@ test.describe('Pattern lifecycle', () => {
     await expect(page.getByText('Unsaved changes')).not.toBeVisible()
 
     await page.reload()
-    await expect(page.getByLabel('Pattern name')).toHaveValue('E2E Pattern Renamed')
+    await expect(page.getByLabel('Pattern name', { exact: true })).toHaveValue('E2E Pattern Renamed')
 
     // Back to the Pattern selection list and confirm the renamed pattern is listed.
     await page.getByRole('button', { name: '← Pattern selection' }).click()
@@ -68,7 +68,7 @@ test.describe('Pattern lifecycle', () => {
   test('clones a pattern, producing a "-1" suffixed copy, then deletes both', async ({ page }) => {
     await page.getByLabel('New pattern name').fill('CloneMe')
     await page.getByRole('button', { name: 'Create new pattern' }).click()
-    await expect(page.getByLabel('Pattern name')).toHaveValue('CloneMe')
+    await expect(page.getByLabel('Pattern name', { exact: true })).toHaveValue('CloneMe')
 
     await page.getByRole('button', { name: '← Pattern selection' }).click()
     await expect(page.getByText('CloneMe')).toBeVisible()

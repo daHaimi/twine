@@ -64,7 +64,7 @@ test.describe('Picks grid touch/mouse gestures', () => {
 
     await page.getByLabel('New pattern name').fill('Gesture Pattern')
     await page.getByRole('button', { name: 'Create new pattern' }).click()
-    await expect(page.getByLabel('Pattern name')).toHaveValue('Gesture Pattern')
+    await expect(page.getByLabel('Pattern name', { exact: true })).toHaveValue('Gesture Pattern')
 
     await page.getByRole('button', { name: 'Add pick' }).click()
   })
