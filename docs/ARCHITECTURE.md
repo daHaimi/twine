@@ -23,9 +23,10 @@ decision/rationale for ambiguous points in the brief — read that first for
 | E2E/browser testing | Playwright (headless Chromium; a touch-enabled mobile device profile too) |
 | Linting | `oxlint` |
 
-See decisions #1–#20 in `IMPLEMENTATION-PLAN.md` for the rationale behind
+See decisions #1–#22 in `IMPLEMENTATION-PLAN.md` for the rationale behind
 each of these, plus the GTT-format-specific conventions TWINE follows
-(colour packing, line endings, default palette/cards, etc).
+(colour packing, line endings, default palette/cards, etc) and the Node
+version requirement.
 
 ## Source layout
 
@@ -41,7 +42,13 @@ twine/
 │   │   │   └── io.ts           # Browser-facing glue: File read, download-as-GTT
 │   │   ├── naming.ts           # Clone/duplicate "-<N>" suffix rule
 │   │   ├── simulation.ts       # CurThread/CurPos/CurHoles recomputation
+│   │   ├── weavingDraft.ts     # Draft rows, direction symbols, repetition expansion,
+│   │   │                       #   incremental recompute cache (Stage 4)
 │   │   └── pickAction.ts       # Pick-cell action cycling + swipe-gesture classification
+│   ├── hooks/
+│   │   └── useDraftRows.ts     # Feeds the live preview from the incremental draft cache
+│   ├── components/
+│   │   └── DraftChart/         # Shared thread-path chart renderer (full + preview views)
 │   ├── storage/
 │   │   ├── db.ts               # IndexedDB schema + shared connection (idb)
 │   │   └── patternRepository.ts # Pattern CRUD, default-pattern factory
@@ -51,10 +58,7 @@ twine/
 │   ├── pages/              # One folder per frontend state (component + CSS module)
 │   │   ├── PatternSelection/
 │   │   ├── EditPattern/
-│   │   └── WeavingDraft/
-│   ├── components/         # Shared UI building blocks (currently unused/empty — reserved
-│   │                        # for cross-page widgets as later stages add them, e.g. a
-│   │                        # shared colour picker or confirmation dialog)
+│   │   └── WeavingDraft/       # WeavingDraftPage.tsx + CSS module + print.css (A4)
 │   ├── styles/global.css   # Base styles, CSS custom properties, prefers-color-scheme
 │   └── app/App.tsx         # Router setup wiring the 3 frontend states together
 ├── tests/
@@ -114,6 +118,37 @@ picks against a card's static `Holes`/`Threading`. Also resolves TWINE's
 Pack-mode extension: when a pick is in `Pack` mode, a card's net rotation
 for that pick is the cumulative sum of every pack covering that card (that
 has an explicit action in the pick), applied in ascending `Pack.order`.
+
+### `weavingDraft.ts`
+Computes the Stage 3 Weaving Draft rendering model for a pattern:
+- `computeDraftRows` produces one row per pick with one cell per card. It
+  deliberately calls `simulation.ts`'s `resolveCardDelta` so pack-overlap
+  resolution is identical to GTT export, and stores the net rotation delta
+  plus the palette colour at the card's weaving position (before that pick).
+- `draftSymbol` maps `(threading, net delta)` to the brief's `\ / |` stroke
+  table. A net delta of zero also covers cancelling overlapping packs and
+  twists, which render as Idle by design.
+- `rowLabel` produces the A/B/C… row labels of `webbrief.png`.
+- `expandDraftRows` repeats the *whole* pattern 1–4 times (clamped) and
+  annotates each row with a `repeatIndex` so the view can draw the thicker
+  separator between repetitions.
+- **Incremental recompute cache (Stage 4):** `DraftCache` stores the last
+  rows together with a config signature (cards/packs/palette) and a per-pick
+  signature. `updateDraftCache` reuses all rows before the first changed pick
+  by reference and recomputes only the tail from `positionAfter` seeds via
+  `computeDraftRowsFrom`; an unchanged pattern returns the identical cache
+  object and any config change falls back to a full recompute.
+
+The shared `components/DraftChart/` renders the setup grid, the draft grid
+(SVG strokes, palette fills, repeat separators) and legend. Both
+`pages/WeavingDraft/` (full view) and `pages/EditPattern/` (compact live
+preview panel beside the Picks grid) use it, so they cannot disagree about
+how a pick looks. `hooks/useDraftRows.ts` feeds the preview from the
+incremental cache; it is the React-side bridge to the pure domain functions.
+Print geometry lives in `pages/WeavingDraft/print.css`
+(`@page { size: A4 portrait }` + hiding app chrome) with chart print sizing in
+`DraftChart.module.css`. See decision #21 for the webbrief layout
+interpretation.
 
 ### `pickAction.ts`
 Drives the Picks-grid cell interaction model described in the brief
@@ -256,6 +291,12 @@ fallback, which the test suite relies on).
 - `picks-gestures.spec.ts`: the full 6-state tap cycle, swipe-up,
   swipe-down, swipe-sideways, and the plain-click tap-fallback path — on
   both projects.
+- `weaving-draft.spec.ts`: setup/draft chart rendering, the 1–4 repetition
+  control, print-media hiding of controls, and A4 `page.pdf()` output
+  (desktop-only; mobile emulation cannot generate PDFs).
+- `draft-preview.spec.ts`: the live preview updates immediately on pick edits
+  (including a later pick, exercising the incremental path) and links to the
+  full draft view, on both desktop and mobile.
 
 **Simulating a touch swipe:** use `locator.dispatchEvent('pointerdown' |
 'pointerup', { clientX, clientY, pointerId: 1, pointerType: 'touch' })`
@@ -281,17 +322,21 @@ in the repo).
 `npm run build` runs `tsc -b && vite build`, producing a pure static
 `dist/` (no server runtime required) — intended to be served as-is by
 nginx per the brief. Linting is `oxlint` (`npm run lint`), configured for
-zero warnings/errors as the baseline.
+zero warnings/errors as the baseline. The toolchain requires Node
+`^22.22.2 || ^24.15.0 || >=26.0.0` (pinned in `.nvmrc`); npm scripts run a
+guard that fails early with an `nvm use` hint on older runtimes (decision
+#22). Playwright browsers are installed once with
+`npx playwright install chromium` — see the E2E section above.
 
 ## Current status & what's next
 
-This document reflects the architecture as of the end of **Stage 2**
-("Complete Edit pattern" for both desktop and smartphone). See
-`IMPLEMENTATION-PLAN.md`'s stage checklist for exact per-item status;
-briefly, Stages 0–2 are complete (scaffolding, core domain/storage/pages,
-full Picks/Cards grid editing with mouse + touch gestures, responsive
-layout, unit/fuzz/E2E test coverage for all of the above). Stages 3–6
-(Weaving Draft rendering + printing, live draft preview during editing,
-picks optimizer, snippet library) are not yet started; `src/components/`
-and the `snippets` IndexedDB store are present but unused, reserved for
-those stages.
+This document reflects the architecture as of the end of **Stage 4** (live
+draft preview). See `IMPLEMENTATION-PLAN.md`'s stage checklist for exact
+per-item status; briefly, Stages 0–4 are complete (scaffolding, core
+domain/storage/pages, full Picks/Cards grid editing with mouse + touch
+gestures, responsive layout, the weaving-draft thread-path chart with
+direction strokes/repetition control/A4 print stylesheet, and the live
+preview panel fed by incremental recomputation — all with unit/fuzz/E2E
+coverage). Stages 5–6 (picks optimizer, snippet library) are not yet started;
+the `snippets` IndexedDB store is present but unused, reserved for those
+stages.
