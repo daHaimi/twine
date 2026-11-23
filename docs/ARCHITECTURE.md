@@ -251,9 +251,12 @@ Both draft routes render the same `WeavingDraftPage`, parameterized by a
 `backTo` prop — this satisfies "from both other states, the Weaving draft
 can be accessed" while keeping a single back-navigation target per entry
 point. `App` renders a shared `components/AppFooter` alongside the router on
-every route; it carries the free/no-data/no-ads statement and a PayPal
-"Buy me a coffee" link, and uses the `twine-app-chrome` class so print output
-excludes it.
+every route; it carries the free/no-data/no-ads statement, a PayPal
+"Buy me a coffee" link and an "Available on GitHub" link to the publication
+repository (`git@github.com:daHaimi/twine.git`, branch `master`), and uses the
+`twine-app-chrome` class so print output excludes it. The repository's own
+initial commit supplies the `LICENSE`; local work was rebased onto it before
+pushing to keep that file in history.
 
 Each page owns a CSS module with its own `@media (max-width: 640px)`
 (layout) and `@media (pointer: coarse)` (touch-target sizing, 44px minimum)
