@@ -2,14 +2,14 @@
 
 TWINE (**T**ablet **W**eaving **IN**teractive **E**ditor) is a fully
 client-side, static web app for viewing, editing, and printing tablet
-weaving patterns in the [GTT format](../../GTT-DEFINITION.md). There is no
+weaving patterns in the GTT format. There is no
 backend: the production artifact is a plain `dist/` folder (HTML/CSS/JS)
 served as-is by nginx, and all persistence happens in the browser's
 IndexedDB. This document describes how the codebase is organized and why,
-as a companion to [`IMPLEMENTATION-PLAN.md`](../../IMPLEMENTATION-PLAN.md)
-(which records the stage-by-stage build plan and every explicit
-decision/rationale for ambiguous points in the brief — read that first for
-*why* a given technology or format convention was chosen).
+as a companion to the project's implementation plan (which records the
+stage-by-stage build plan and every explicit decision/rationale for ambiguous
+points in the brief — read that first for *why* a given technology or format
+convention was chosen).
 
 ## Technology stack
 
