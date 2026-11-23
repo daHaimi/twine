@@ -45,6 +45,9 @@ describe('App routing', () => {
     const link = screen.getByRole('link', { name: /Buy me a coffee/i })
     expect(link).toHaveAttribute('href', 'https://www.paypal.me/tungavp')
     expect(link).toHaveAttribute('target', '_blank')
+    const github = screen.getByRole('link', { name: /Available on GitHub/i })
+    expect(github).toHaveAttribute('href', 'https://github.com/daHaimi/twine')
+    expect(github).toHaveAttribute('target', '_blank')
   })
 
   it('redirects unknown paths back to "/"', async () => {

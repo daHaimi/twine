@@ -26,6 +26,9 @@ test.describe('Site footer', () => {
     const coffee = page.getByRole('link', { name: /Buy me a coffee/i })
     await expect(coffee).toHaveAttribute('href', 'https://www.paypal.me/tungavp')
     await expect(coffee).toHaveAttribute('target', '_blank')
+    const github = page.getByRole('link', { name: /Available on GitHub/i })
+    await expect(github).toHaveAttribute('href', 'https://github.com/daHaimi/twine')
+    await expect(github).toHaveAttribute('target', '_blank')
 
     await page.getByLabel('New pattern name').fill('Footer Check')
     await page.getByRole('button', { name: 'Create new pattern' }).click()

@@ -14,15 +14,26 @@ export function AppFooter() {
       <p className={styles.request}>
         If you like it, please buy me a coffee.
       </p>
-      <a
-        className={styles.coffeeButton}
-        href="https://www.paypal.me/tungavp"
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Opens PayPal in a new tab"
-      >
-        <span aria-hidden="true">☕</span> Buy me a coffee
-      </a>
+      <div className={styles.links}>
+        <a
+          className={styles.coffeeButton}
+          href="https://www.paypal.me/tungavp"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Opens PayPal in a new tab"
+        >
+          <span aria-hidden="true">☕</span> Buy me a coffee
+        </a>
+        <a
+          className={styles.githubLink}
+          href="https://github.com/daHaimi/twine"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Opens the TWINE repository on GitHub in a new tab"
+        >
+          Available on GitHub
+        </a>
+      </div>
     </footer>
   )
 }
