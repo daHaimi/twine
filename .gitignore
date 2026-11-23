@@ -28,3 +28,11 @@ coverage
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Local testing and development files
+/10cOseberg12L1-aisling.gtt
+/card-config.png
+/GTT-DEFINITION.md
+/IMPLEMENTATION-PLAN.md
+/PROJECT-PROMPT.md
+/webbrief.png
